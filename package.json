@@ -1,0 +1,11 @@
+{
+  "name": "img-downloader",
+  "version": "1.0.0",
+  "description": "",
+  "main": "img-downloader.js",
+  "dependencies": {
+    "fs": "0.0.1-security",
+    "request": "^2.88.0",
+    "scraperjs": "^1.2.0"
+  }
+}
