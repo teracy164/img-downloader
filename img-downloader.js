@@ -60,14 +60,14 @@ async function downloadImage(imageUrl) {
 
 async function downloadImages(imageUrls) {
     console.log('download start...');
-    let result = true;
+    const tmpPromise = [];
     for (const imageUrl of imageUrls) {
-        if (!await downloadImage(imageUrl)) {
-            result = false;
-        }
+        tmpPromise.push(downloadImage(imageUrl));
     }
-
-    if (!result) {
+    // wait all promise
+    const result = await Promise.all(tmpPromise);
+    if (result.some(r => !r)) {
+        // exit error
         // nop
     }
 }
