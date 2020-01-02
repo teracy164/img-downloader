@@ -13,7 +13,7 @@ class ScraperUtil {
         return new Promise((resolve, reject) => {
             scraperjs.StaticScraper.create(pageUrl)
                 .scrape(($) => fnScraping($))
-                .then(imageUrls => resolve(imageUrls))
+                .then(items => resolve(items))
                 .catch(err => reject(err));
         });
     }
