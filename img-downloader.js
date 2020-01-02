@@ -6,13 +6,12 @@ if (!targetPage) {
     return;
 }
 
-console.log('target page: ', targetPage)
-
 const fileUtil = require('./utils/file.util');
 const httpUtil = require('./utils/http.util');
 const strUtil = require('./utils/string.util');
 
 const execDate = new Date();
+let tmpRawCount = 1;
 
 function getOutputDir() {
     return __dirname + '/output/' + execDate.getFullYear()
@@ -33,29 +32,44 @@ function getDownLoadFileName(imageUrl) {
 }
 
 async function downloadImage(imageUrl) {
-    // get image
-    const image = await httpUtil.requestGet(imageUrl);
-    // get file name
-    const fileName = getDownLoadFileName(imageUrl);
-    const outputDir = getOutputDir();
-    // write file
-    await fileUtil.writeFile(outputDir + '/' + fileName, image);
+    try {
+        let imageData = null;
+        let fileName = null;
+        if (strUtil.isDataStr(imageUrl)) {
+            imageData = strUtil.getImageData(imageUrl);
+            const type = strUtil.getImageType(imageUrl);
+            fileName = 'raw' + (tmpRawCount++) + '.' + type;
+        } else {
+            const url = strUtil.isUrl(imageUrl) ? imageUrl : targetPage + '/' + imageUrl;
+            // get image
+            imageData = await httpUtil.requestGet(url);
+            // get file name
+            fileName = getDownLoadFileName(imageUrl);
+        }
+        const outputDir = getOutputDir();
+        // write file
+        await fileUtil.writeFile(outputDir + '/' + fileName, imageData);
+        console.log('save => ' + (outputDir + '/' + fileName));
+
+        return true;
+    } catch (err) {
+        console.log(err)
+        return false;
+    }
 }
 
 async function downloadImages(imageUrls) {
     console.log('download start...');
-    const promises = [];
-
+    let result = true;
     for (const imageUrl of imageUrls) {
-        const url = strUtil.isFullUrl(imageUrl) ? imageUrl : targetPage + '/' + imageUrl;
-        console.log('download from ' + url);
-        // download image
-        const promise = downloadImage(url);
-        // push Promise
-        promises.push(promise);
+        if (!await downloadImage(imageUrl)) {
+            result = false;
+        }
     }
-    // wait download complete all files
-    await Promise.all(promises);
+
+    if (!result) {
+        // nop
+    }
 }
 
 async function getImageUrls(pageUrl) {
@@ -64,6 +78,9 @@ async function getImageUrls(pageUrl) {
 }
 
 async function main() {
+    console.log('\n\n\n\n\n');
+    console.log('target page: ', targetPage)
+
     const outputDir = getOutputDir();
     console.log('output dir: ' + outputDir);
     try {
