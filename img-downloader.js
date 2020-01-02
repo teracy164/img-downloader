@@ -10,11 +10,11 @@ console.log('target page: ', targetPage)
 
 const fileUtil = require('./utils/file.util');
 const httpUtil = require('./utils/http.util');
+const strUtil = require('./utils/string.util');
 
 const execDate = new Date();
 
 function getOutputDir() {
-    const strUtil = require('./utils/string.util');
     return __dirname + '/output/' + execDate.getFullYear()
         + strUtil.paddingZero(execDate.getMonth() + 1)
         + strUtil.paddingZero(execDate.getDate())
@@ -47,7 +47,7 @@ async function downloadImages(imageUrls) {
     const promises = [];
 
     for (const imageUrl of imageUrls) {
-        const url = imageUrl.startsWith('/') ? targetPage + imageUrl : imageUrl;
+        const url = strUtil.isFullUrl(imageUrl) ? imageUrl : targetPage + '/' + imageUrl;
         console.log('download from ' + url);
         // download image
         const promise = downloadImage(url);
