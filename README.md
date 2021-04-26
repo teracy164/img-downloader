@@ -1,8 +1,14 @@
 # img-downloader
 
+## Install
+
+```shell
+npm install
+```
+
 ## Usage
 
-```
+```shell
 node img-downloader.js {target-site-url}
 ```
 
